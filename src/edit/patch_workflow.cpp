@@ -49,6 +49,21 @@ std::vector<std::string> split_strings(const std::string& value, char delim) {
     return parts;
 }
 
+std::vector<std::string> split_tsv_preserve_empty(const std::string& line) {
+    std::vector<std::string> fields;
+    std::string current;
+    for (char ch : line) {
+        if (ch == '\t') {
+            fields.push_back(current);
+            current.clear();
+        } else {
+            current += ch;
+        }
+    }
+    fields.push_back(current);
+    return fields;
+}
+
 bool is_safe_repo_relative_path(const std::string& path_text) {
     const fs::path path(path_text);
     if (path.is_absolute()) {
@@ -110,12 +125,7 @@ std::optional<PatchProposal> load_patch_proposal(const fs::path& root,
         return std::nullopt;
     }
 
-    std::vector<std::string> fields;
-    std::stringstream ls(line);
-    std::string field;
-    while (std::getline(ls, field, '\t')) {
-        fields.push_back(field);
-    }
+    const std::vector<std::string> fields = split_tsv_preserve_empty(line);
     if (fields.size() < 4) {
         return std::nullopt;
     }

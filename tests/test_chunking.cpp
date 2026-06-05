@@ -246,7 +246,11 @@ static void test_patch_apply_reject_workflow() {
     assert(rejected_meta && rejected_meta->status == "rejected");
 
     auto invalid = save_patch_proposal(repo, "invalid", "not a diff\n", {});
+    auto invalid_meta = load_patch_proposal(repo, invalid.id);
+    assert(invalid_meta);
+    assert(invalid_meta->target_paths.empty());
     assert(!apply_patch_proposal(repo, invalid.id, &error));
+    assert(error == "Patch proposal has no valid target paths.");
 
     write_text(repo / "note.txt", "drifted\n");
     auto drift = save_patch_proposal(repo, "drift", diff_text, targets);

@@ -312,6 +312,12 @@ int cmd_patch(const fs::path& root, const std::string& instruction) {
     const OllamaClient ollama(cfg);
     const std::string diff_text = ollama.chat(system, user);
     const auto target_paths = extract_patch_target_paths(diff_text);
+    if (target_paths.empty()) {
+        std::cerr
+            << "Model did not return a valid unified diff with target files. "
+            << "Patch proposal was not saved.\n";
+        return 1;
+    }
     const PatchProposal proposal = save_patch_proposal(root, instruction, diff_text, target_paths);
 
     std::cout << "Saved patch proposal " << proposal.id
