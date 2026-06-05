@@ -28,6 +28,28 @@ Implemented in this MVP:
 - Lexical scoring.
 - Hybrid ranking.
 
+## Phase 1.5: project structure refactor
+
+Before adding Tree-sitter or more advanced retrieval, split the current single-file prototype into small, testable modules.
+
+Goals:
+
+- Keep `main.cpp` as a thin CLI entry point only.
+- Move configuration loading into `config.hpp/.cpp`.
+- Move filesystem scanning and ignore handling into `repo_scanner.hpp/.cpp`.
+- Move chunk models and extraction logic into `chunk.hpp`, `chunk_extractor.hpp/.cpp`, and language-specific heuristic extractors.
+- Move Ollama calls into `ollama_client.hpp/.cpp`.
+- Move vector persistence and manifest handling into `index_store.hpp/.cpp`.
+- Move ranking and retrieval into `retriever.hpp/.cpp`.
+- Add a small test fixture repo to validate chunking and retrieval behavior.
+
+Exit criteria:
+
+- `main.cpp` is under roughly 100 lines.
+- The project still builds with plain CMake and C++20.
+- `init`, `index`, `stats`, `search`, `ask`, and `explain` keep the same CLI behavior.
+- Go, C/C++, Python, JS/TS, Markdown, and config indexing still work after the split.
+
 ## Phase 2: better parsing
 
 - Introduce `ChunkExtractor` interface.
