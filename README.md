@@ -7,7 +7,7 @@ The goal is to test a practical thesis: a coding assistant for limited hardware 
 ## What this MVP does
 
 - Scans a local repository.
-- Builds structural-ish chunks for C/C++, JavaScript/TypeScript, Python, Markdown, and config files.
+- Builds structural-ish chunks for C/C++, Go, JavaScript/TypeScript, Python, Markdown, and config files.
 - Stores a local `.ultracode/` index with chunk files, vectors, and a TSV manifest.
 - Calls Ollama `/api/embed` for embeddings when available.
 - Falls back to a local hashed embedding when Ollama is not running.
@@ -16,6 +16,17 @@ The goal is to test a practical thesis: a coding assistant for limited hardware 
 - Prints file paths and line ranges as sources.
 
 This first version intentionally avoids external C++ dependencies. It shells out to `curl` for Ollama calls so it can build with a plain C++20 compiler.
+
+## Supported languages in Phase 1
+
+The Phase 1 indexer uses lightweight heuristic chunking for:
+
+- C/C++: classes, structs, enums, functions.
+- Go: functions, methods with receivers, structs, and interfaces.
+- Python: classes and functions.
+- JavaScript/TypeScript: class/function-like blocks using the C-like extractor.
+- Markdown: sections by heading.
+- Config files: line-based chunks.
 
 ## Requirements
 
@@ -77,13 +88,14 @@ Sends a single file to the configured chat model for explanation.
 
 ## Current limitations
 
-This MVP uses lightweight heuristic chunking instead of Tree-sitter. That is intentional for the first commit because the repo starts empty and the priority is to prove the full local flow end-to-end first.
+This MVP uses lightweight heuristic chunking instead of Tree-sitter. That is intentional for Phase 1 because the priority is to prove the full local flow end-to-end first.
 
 Planned next step:
 
 - Add a `ChunkExtractor` interface.
 - Keep the heuristic extractor as fallback.
 - Add a Tree-sitter-backed extractor for C/C++ first.
+- Add Tree-sitter-backed extractors for Go, Python, and TypeScript.
 - Add incremental indexing by file hash.
 - Replace shell-based curl calls with a small HTTP client abstraction.
 - Add streaming chat output.
